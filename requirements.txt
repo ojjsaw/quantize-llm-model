@@ -1,0 +1,6 @@
+optimum[openvino,nncf]
+langchain
+chromadb
+pysqlite3-binary
+sentence-transformers
+langchainhub

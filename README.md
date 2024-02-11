@@ -40,3 +40,13 @@ aws s3 sync s3://llmragstore data
 
 
 ```
+
+```bash
+vi /home/codespace/.python/current/lib/python3.10/site-packages/chromadb/__init__.py 
+
+# add below to top of file
+__import__('pysqlite3')
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+
+```

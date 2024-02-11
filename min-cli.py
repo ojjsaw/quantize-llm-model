@@ -23,15 +23,15 @@ warnings.filterwarnings("ignore")
 
 def process_response(data, duration):
     response_data = { 
-        'qs': data['question'], 
-        'ans': data['answer'], 
-        'sources': [],
-        'duration': f'{duration:.2f} sec'}
+        "qs": data['question'], 
+        "ans": data['answer'], 
+        "sources": [],
+        "duration": f'{duration:.2f} sec'}
     
     for doc in data['context']:
         if hasattr(doc, 'metadata') and isinstance(doc.metadata, dict):
             metadata = doc.metadata
-            url_dict = {'title': metadata['title'], 'url': metadata['source']}
+            url_dict = {"title": metadata['title'], "url": metadata['source']}
             if not any(source['url'] == url_dict['url'] for source in response_data['sources']):
                 if 'Glossary' not in url_dict['title']:
                     response_data['sources'].append(url_dict)

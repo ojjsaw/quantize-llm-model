@@ -1,0 +1,14 @@
+{'ans': ' OpenVINO is an open-source software toolkit designed to optimize, '
+        'accelerate, and deploy deep learning models for various applications. '
+        'It is developed by Intel and supports a wide range of Intel hardware '
+        'platforms, including CPUs, GPUs, and NPUs. The toolkit streamlines '
+        'the deployment of deep learning models in user applications, '
+        'optimizing and accelerating model inference for domains like '
+        'Generative AI, Large Language models, and use cases such as object '
+        'detection, classification, and segmentation.',
+ 'duration': '92.65 sec',
+ 'qs': 'what is openvino?',
+ 'sources': [{'title': 'About OpenVINO — OpenVINO™  documentation',
+              'url': 'https://docs.openvino.ai/2023.3/about_openvino.html'},
+             {'title': 'GET STARTED — OpenVINO™  documentation',
+              'url': 'https://docs.openvino.ai/2023.3/get_started.html'}]}
