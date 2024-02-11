@@ -11,7 +11,7 @@ pip install -r requirements.txt
 ```
 
 ```bash
-python convert.py --model_id 'Intel/neural-chat-7b-v3-3' --output_dir models/neural-chat-7b-v3-3 --compress_weights INT4_ASYM --ratio 0.8 --group_size 128
+python convert.py --model_id Intel/neural-chat-7b-v3-3 --output_dir models/neural-chat-7b-v3-3-INT4_ASYM-0.8-128 --compress_weights INT4_ASYM --ratio 0.8 --group_size 128
 ```
 
 ```bash
