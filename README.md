@@ -24,3 +24,19 @@ decoder; t5; falcon; gpt-; gpt2; aquila; mpt; open-llama; openchat; neural-chat;
 akAKIA4UQN57YSV4JW5CWD
 skC2vvI9eykH8/Ar3z9djhszxX8bkyswRFlY0HldGI
 ```
+
+```bash
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+
+aws configure
+
+upload:
+aws s3 sync openvino.genai/llm_bench/python/models s3://llmragstore
+
+download:
+aws s3 sync s3://llmragstore /my/local/folder
+
+
+```
