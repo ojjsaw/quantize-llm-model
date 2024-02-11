@@ -36,7 +36,7 @@ upload:
 aws s3 sync openvino.genai/llm_bench/python/models s3://llmragstore
 
 download:
-aws s3 sync s3://llmragstore /my/local/folder
+aws s3 sync s3://llmragstore data
 
 
 ```
