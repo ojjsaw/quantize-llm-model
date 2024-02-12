@@ -11,9 +11,9 @@ response_test_data = {
     {"txt":"my title1", "url":"https://myurl1"},
     {"txt":"my title2", "url":"https://myurl2"}
   ],
-  "qs": "my question",
-  "ans": "my answer",
-  "ts": "90 sec",
+  "qs": "my dummy question",
+  "ans": "my dummy answer",
+  "ts": "120 sec",
   "id": "myuniqueid",
   "usr": "myusr"
 }
@@ -34,9 +34,11 @@ while True:
 
     for message in messages:
         try:
+            print(message)
             # Process the message (example: extract and transform data)
             message_body = json.loads(message['Body'])
 
+            #print(message_body)
             user = message_body['usr']
             question = message_body['qs']
             question_id = message['MessageId']
@@ -46,11 +48,19 @@ while True:
             new_response_body['id'] = question_id
             new_response_body['usr'] = user
             new_response_body['qs'] = question
+
+            # simulate 120sec work
+            time.sleep(90)
             
+            message_group_id = 'messageGroup1'
+            message_deduplication_id = 'uniqueMessageId123'
+
             # Send processed message to "workitem-progress" queue
             sqs.send_message(
                 QueueUrl=target_queue_url,
-                MessageBody=json.dumps(new_response_body)
+                MessageBody=json.dumps(new_response_body),
+                MessageGroupId=message_group_id,
+                MessageDeduplicationId=message_deduplication_id
             )
             
             # Delete the processed message from the "workitem" queue

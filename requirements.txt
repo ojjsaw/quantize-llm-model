@@ -4,3 +4,4 @@ chromadb
 pysqlite3-binary
 sentence-transformers
 langchainhub
+boto3
