@@ -99,6 +99,10 @@ rag_chain = RunnableParallel(
     {"context": retriever, "question": RunnablePassthrough()}
 ).assign(answer=rag_chain_from_docs)
 
+print("Warming up...")
+rag_chain.invoke("what is openvino?")
+print("Warming up completed. Ready!")
+
 cpu_name = get_cpu_name()
 
 while True:
