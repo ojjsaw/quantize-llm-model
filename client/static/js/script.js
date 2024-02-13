@@ -1,5 +1,5 @@
 let jwtToken = '';
-let server_url = 'https://silver-invention-q9p774x44p39q9p-8000.app.github.dev'
+let server_url = 'https://localhost:8000'
 function toggleChatWindow() {
     const chatContent = document.getElementById('chat-content');
     chatContent.style.display = chatContent.style.display === 'none' ? 'block' : 'none';
@@ -7,16 +7,25 @@ function toggleChatWindow() {
 
 async function loginAndGetToken() {
     // Replace with your login API URL and credentials
-    const login_url = server_url + '/api/login' + `?user_id=user`;
+    const login_url = '/api/login?user_id=uxyz';
     const response = await fetch(login_url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({user_id: 'user'}),
+        body: JSON.stringify({ user_id: 'userxyz' }),
+        credentials: 'include'
     });
-    const data = await response.json();
-    jwtToken = data.jwtToken;  // Adjust based on your API response structure
+
+    if (response.ok) {
+        displayMessage('Login success.', 'bot');
+        console.log("success login")
+    }else{
+        console.log("fail login")
+    }
+    
+    // const data = await response.json();
+    // jwtToken = data.jwtToken;  // Adjust based on your API response structure
 }
 
 async function sendMessage() {

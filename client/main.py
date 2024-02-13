@@ -8,6 +8,7 @@ from pydantic import BaseModel
 import boto3
 import json
 import time
+from fastapi.staticfiles import StaticFiles
 
 # Init SQS & define urls
 sqs = boto3.client('sqs')
@@ -27,6 +28,8 @@ app = FastAPI(
     -> AWS SQS (Workitems Queue) -> (User Query) On-Prem Processing (Response) -> AWS SQS (WorkitemsResults Queue) -> AWS Lambda Function Trigger -> \
     AWS DynamoDB (NoSQL Q&A store).</p>'
 )
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 SECRET_KEY = "a_very_secret_key"
 ALGORITHM = "HS256"
