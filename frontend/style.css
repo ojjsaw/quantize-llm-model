@@ -1,0 +1,32 @@
+#chatbot {
+    position: fixed;
+    bottom: 0;
+    right: 20px;
+    width: 300px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+}
+
+#chat-header {
+    background-color: #007bff;
+    color: #ffffff;
+    padding: 10px;
+    cursor: pointer;
+}
+
+#chat-content {
+    padding: 10px;
+}
+
+#messages {
+    height: 200px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    padding: 5px;
+}
+
+#userInput {
+    width: calc(100% - 60px);
+    padding: 5px;
+}

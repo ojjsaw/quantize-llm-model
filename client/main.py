@@ -11,6 +11,10 @@ import time
 
 # Init SQS & define urls
 sqs = boto3.client('sqs')
+dynamodb = boto3.resource('dynamodb')
+table_name = 'llmrag'
+table = dynamodb.Table(table_name)
+
 source_queue_url = 'WorkItem.fifo'
 target_queue_url = 'WorkItemProgress.fifo'
 
@@ -88,16 +92,30 @@ def ask_question(request: Request, question: str):
 
     question_id = response['MessageId']
 
-    return {"user": user_id, "question": question, "identifier": question_id}
+    data = {"user": user_id, "question": question, "identifier": question_id}
+    return data
 
 @app.post("/api/response", tags=["Q&A"])
-def check_response(request: Request, question: str):
+def check_response(request: Request, question_id: str):
     token = request.cookies.get("access_token")
     if not token:
         raise HTTPException(status_code=400, detail="Not authenticated")
     token = token.split(" ")[1]  # Remove "Bearer" prefix
     user_id = verify_token(token)
-    return {"user": user_id, "question": question}
+    
+    response = table.get_item(
+        Key={
+            'id': question_id
+        }
+    )
+    item = response.get('Item', {})
+    
+    if item:
+        if item['messageBody']['usr'] != user_id:
+            raise HTTPException(status_code=400, detail=f"Response is not intended for user {user_id}")
+        return {"answer_found": True, "data": item}
+    else:
+        return {"answer_found": False, "question": question_id, "status": "queued or processing"}
 
 @app.post("/api/logout", tags=["Session"])
 def logout(response: Response):
