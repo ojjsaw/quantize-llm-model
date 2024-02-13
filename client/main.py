@@ -122,8 +122,8 @@ def check_response(request: Request, question_id: str):
     item = response.get('Item', {})
     
     if item:
-        print(user_id)
-        print(item['messageBody'])
+        #print(user_id)
+        # print(item['messageBody'])
         if item['messageBody']['usr'] != user_id:
             raise HTTPException(status_code=400, detail=f"Response is not intended for user {user_id}")
         return {"answer_found": True, "data": item['messageBody']}
