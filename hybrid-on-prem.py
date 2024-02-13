@@ -31,6 +31,16 @@ max_new_tokens = 300
 
 warnings.filterwarnings("ignore")
 
+def get_cpu_name():
+    try:
+        with open("/proc/cpuinfo") as f:
+            for line in f:
+                if "model name" in line:
+                    # The CPU model name is on this line, split by colon
+                    return line.split(":")[1].strip()
+    except FileNotFoundError:
+        return "CPU information not available"
+    
 def process_response(data, duration, user: str, question_id: str):
     response_data = { 
         "qs": data['question'], 
@@ -86,6 +96,69 @@ rag_chain_from_docs = (
 rag_chain = RunnableParallel(
     {"context": retriever, "question": RunnablePassthrough()}
 ).assign(answer=rag_chain_from_docs)
+
+cpu_name = get_cpu_name()
+
+while True:
+    # Receive a message from the "workitem" queue
+    response = sqs.receive_message(
+        QueueUrl=source_queue_url,
+        MaxNumberOfMessages=1,  # Adjust as needed
+        WaitTimeSeconds=20  # Long polling
+    )
+
+    messages = response.get('Messages', [])
+    
+    if not messages:
+        print("No messages to process. Waiting for new messages...")
+        continue  # Skip to the next iteration of the loop
+
+    for message in messages:
+        try:
+            print(message)
+            # Process the message (example: extract and transform data)
+            message_body = json.loads(message['Body'])
+
+            print(message_body)
+            user = message_body['usr']
+            question = message_body['qs']
+            question_id = message['MessageId']
+
+            start_time = time.time()
+            result = rag_chain.invoke(question)
+            end_time = time.time()
+            duration = end_time - start_time
+
+            new_response_body = process_response(result, duration, user, question_id)
+            response['hw'] = cpu_name
+
+            # simulate 120sec work
+            time.sleep(90)
+        
+            message_group_id = 'messageGroup1'
+            message_deduplication_id = 'uniqueMessageId123'
+
+            # Send processed message to "workitem-progress" queue
+            sqs.send_message(
+                QueueUrl=target_queue_url,
+                MessageBody=json.dumps(new_response_body),
+                MessageGroupId=message_group_id,
+                MessageDeduplicationId=message_deduplication_id
+            )
+            
+            # Delete the processed message from the "workitem" queue
+            sqs.delete_message(
+                QueueUrl=source_queue_url,
+                ReceiptHandle=message['ReceiptHandle']
+            )
+            
+            print(f"Processed and deleted message {message['MessageId']}")
+            
+        except Exception as e:
+            print(f"Error processing message {message['MessageId']}: {str(e)}")
+            # Handle the error (optional: could involve logging or retries)
+
+    time.sleep(1)
 
 while True:
     question = input("Enter your question (or 'exit' to quit): ")

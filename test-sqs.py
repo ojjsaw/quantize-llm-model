@@ -18,6 +18,18 @@ response_test_data = {
   "usr": "myusr"
 }
 
+def get_cpu_name():
+    try:
+        with open("/proc/cpuinfo") as f:
+            for line in f:
+                if "model name" in line:
+                    # The CPU model name is on this line, split by colon
+                    return line.split(":")[1].strip()
+    except FileNotFoundError:
+        return "CPU information not available"
+    
+cpu_name = get_cpu_name()
+
 while True:
     # Receive a message from the "workitem" queue
     response = sqs.receive_message(
@@ -48,9 +60,10 @@ while True:
             new_response_body['id'] = question_id
             new_response_body['usr'] = user
             new_response_body['qs'] = question
-
-            # simulate 120sec work
-            time.sleep(90)
+            new_response_body['hw'] = cpu_name
+            
+            # simulate 30sec work
+            time.sleep(30)
             
             message_group_id = 'messageGroup1'
             message_deduplication_id = 'uniqueMessageId123'
