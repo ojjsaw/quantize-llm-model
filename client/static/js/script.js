@@ -1,5 +1,4 @@
 let jwtToken = '';
-let server_url = 'https://localhost:8000'
 function toggleChatWindow() {
     const chatContent = document.getElementById('chat-content');
     chatContent.style.display = chatContent.style.display === 'none' ? 'block' : 'none';
@@ -42,7 +41,7 @@ async function sendMessage() {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({question: message}),
+        // body: JSON.stringify({question: message}),
         credentials: 'include'
     });
 
@@ -52,7 +51,10 @@ async function sendMessage() {
     }
 
     // Simulate thinking animation
-    displayMessage('...', 'bot');
+    const bot_qs = "Q:<b>" + message + "</b>";
+    displayMessage(bot_qs, 'bot');
+
+    displayMessage('Thinking...', 'bot');
 
     // Extract question_id from the response
     const data = await questionResponse.json();
@@ -69,7 +71,7 @@ async function sendMessage() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({question_id: question_id}),
+            // body: JSON.stringify({question_id: question_id}),
             credentials: 'include'
         });
 
@@ -80,9 +82,17 @@ async function sendMessage() {
 
         const answerData = await answerResponse.json();
         console.log(answerData)
+ 
         // Check if answer is available, if not, keep polling
         if (answerData.answer_found) { // Adjust condition based on how your API indicates answer is ready
-            displayMessage(answerData.answer, 'bot'); // Display the answer
+            const info_str = answerData.data['ans'] + "<br/> For more info visit: "
+            displayMessage(info_str, 'bot'); // Display the answer
+            answerData.data.src.forEach(item => {
+                const messageHTML = `<a href="${item.url}" target="_blank">${item.txt}</a>`;
+                displayMessage(messageHTML, 'bot');
+            });
+            displayMessage("Duration: " + answerData.data['ts'] , 'bot');
+            displayMessage("HW: " + answerData.data['hw'], 'bot');
         } else {
             // If answer not yet available, poll again after 30 seconds
             setTimeout(getAnswer, 20000);
@@ -93,13 +103,22 @@ async function sendMessage() {
     getAnswer();
 }
 
+// function displayMessage(message, sender) {
+//     const messagesDiv = document.getElementById('messages');
+//     const messageDiv = document.createElement('div');
+//     messageDiv.textContent = message;
+//     messageDiv.className = sender;  // Use this class to style messages differently
+//     messagesDiv.appendChild(messageDiv);
+//     messagesDiv.scrollTop = messagesDiv.scrollHeight;  // Scroll to the latest message
+// }
+
 function displayMessage(message, sender) {
     const messagesDiv = document.getElementById('messages');
     const messageDiv = document.createElement('div');
-    messageDiv.textContent = message;
-    messageDiv.className = sender;  // Use this class to style messages differently
+    messageDiv.innerHTML = message; // Use innerHTML to parse HTML tags
+    messageDiv.className = sender; // Use this class to style messages differently
     messagesDiv.appendChild(messageDiv);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;  // Scroll to the latest message
+    messagesDiv.scrollTop = messagesDiv.scrollHeight; // Scroll to the latest message
 }
 
 // Call loginAndGetToken when the script loads

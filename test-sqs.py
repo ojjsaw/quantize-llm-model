@@ -42,6 +42,7 @@ while True:
     
     if not messages:
         print("No messages to process. Waiting for new messages...")
+        time.sleep(1)
         continue  # Skip to the next iteration of the loop
 
     for message in messages:
@@ -53,7 +54,7 @@ while True:
             #print(message_body)
             user = message_body['usr']
             question = message_body['qs']
-            question_id = message['MessageId']
+            question_id = message_body['id']
 
             #### testing purposes
             new_response_body = response_test_data
@@ -65,8 +66,8 @@ while True:
             # simulate 30sec work
             time.sleep(10)
             
-            message_group_id = 'messageGroup1'
-            message_deduplication_id = 'uniqueMessageId123'
+            message_group_id = question_id
+            message_deduplication_id = question_id
 
             # Send processed message to "workitem-progress" queue
             sqs.send_message(

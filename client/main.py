@@ -1,3 +1,4 @@
+import uuid
 from fastapi import FastAPI, Depends, HTTPException, status, Response, Request
 from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -31,9 +32,14 @@ app = FastAPI(
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-@app.get("/static")
-async def root():
-    return FileResponse('static/index.html')
+def generate_unique_id():
+    # Current timestamp in a readable format (you can adjust the format as needed)
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    # Generate a random UUID and convert to a string
+    random_uuid = str(uuid.uuid4())
+    # Combine timestamp and a portion of the UUID to increase uniqueness
+    unique_id = f"{timestamp}-{random_uuid.split('-')[0]}"
+    return unique_id
 
 SECRET_KEY = "a_very_secret_key"
 ALGORITHM = "HS256"
@@ -84,11 +90,11 @@ def ask_question(request: Request, question: str):
         raise HTTPException(status_code=400, detail="Not authenticated")
     token = token.split(" ")[1]  # Remove "Bearer" prefix
     user_id = verify_token(token)
+    question_id = generate_unique_id()
+    data = { 'usr': user_id, 'qs': question, 'id': question_id}
 
-    data = { 'usr': user_id, 'qs': question}
-
-    message_group_id = 'messageGroup1'
-    message_deduplication_id = 'uniqueMessageId123'
+    message_group_id = question_id
+    message_deduplication_id = question_id
 
     response = sqs.send_message(
         QueueUrl=source_queue_url,
@@ -96,8 +102,6 @@ def ask_question(request: Request, question: str):
         MessageGroupId=message_group_id,
         MessageDeduplicationId=message_deduplication_id
     )
-
-    question_id = response['MessageId']
 
     data = {"user": user_id, "question": question, "identifier": question_id}
     return data
@@ -118,11 +122,13 @@ def check_response(request: Request, question_id: str):
     item = response.get('Item', {})
     
     if item:
+        print(user_id)
+        print(item['messageBody'])
         if item['messageBody']['usr'] != user_id:
             raise HTTPException(status_code=400, detail=f"Response is not intended for user {user_id}")
-        return {"answer_found": True, "data": item}
+        return {"answer_found": True, "data": item['messageBody']}
     else:
-        return {"answer_found": False, "question": question_id, "status": "queued or processing"}
+        return {"answer_found": False, "question_id": question_id, "status": "queued or processing"}
 
 @app.post("/api/logout", tags=["Session"])
 def logout(response: Response):
@@ -137,6 +143,10 @@ def read_users_me(request: Request):
     token = token.split(" ")[1]  # Remove "Bearer" prefix
     user_id = verify_token(token)
     return {"user_id": user_id}
+
+@app.get("/static", tags=["Troubleshoot"])
+async def root():
+    return FileResponse('static/index.html')
 
 if __name__ == "__main__":
     import uvicorn

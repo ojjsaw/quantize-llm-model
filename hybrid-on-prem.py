@@ -111,6 +111,7 @@ while True:
     
     if not messages:
         print("No messages to process. Waiting for new messages...")
+        time.sleep(1)
         continue  # Skip to the next iteration of the loop
 
     for message in messages:
@@ -122,7 +123,7 @@ while True:
             print(message_body)
             user = message_body['usr']
             question = message_body['qs']
-            question_id = message['MessageId']
+            question_id = message_body['id']
 
             start_time = time.time()
             result = rag_chain.invoke(question)
@@ -130,13 +131,10 @@ while True:
             duration = end_time - start_time
 
             new_response_body = process_response(result, duration, user, question_id)
-            response['hw'] = cpu_name
-
-            # simulate 120sec work
-            time.sleep(90)
+            new_response_body['hw'] = cpu_name
         
-            message_group_id = 'messageGroup1'
-            message_deduplication_id = 'uniqueMessageId123'
+            message_group_id = question_id
+            message_deduplication_id = question_id
 
             # Send processed message to "workitem-progress" queue
             sqs.send_message(
@@ -159,19 +157,3 @@ while True:
             # Handle the error (optional: could involve logging or retries)
 
     time.sleep(1)
-
-while True:
-    question = input("Enter your question (or 'exit' to quit): ")
-    if question.lower() == 'exit':
-        print("Exiting...")
-        break
-
-    start_time = time.time()
-    result = rag_chain.invoke(question)
-    end_time = time.time()
-    duration = end_time - start_time
-
-    question_id = "xyz"
-    user = "abc"
-    response = process_response(result, duration, user, question_id)
-    pprint(response)
