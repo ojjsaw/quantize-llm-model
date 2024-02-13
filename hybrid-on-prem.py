@@ -116,7 +116,6 @@ while True:
 
     for message in messages:
         try:
-            print(message)
             # Process the message (example: extract and transform data)
             message_body = json.loads(message['Body'])
 
