@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException, status, Response, Request
-from fastapi.responses import RedirectResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
@@ -30,6 +30,10 @@ app = FastAPI(
 )
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+@app.get("/static")
+async def root():
+    return FileResponse('static/index.html')
 
 SECRET_KEY = "a_very_secret_key"
 ALGORITHM = "HS256"

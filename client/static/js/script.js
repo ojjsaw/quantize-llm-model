@@ -7,18 +7,19 @@ function toggleChatWindow() {
 
 async function loginAndGetToken() {
     // Replace with your login API URL and credentials
-    const login_url = '/api/login?user_id=uxyz';
+    user_id = Date.now().toString()
+    const login_url = '/api/login?user_id=' + user_id;
     const response = await fetch(login_url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ user_id: 'userxyz' }),
+        body: JSON.stringify({ user_id: user_id }),
         credentials: 'include'
     });
 
     if (response.ok) {
-        displayMessage('Login success.', 'bot');
+        displayMessage('Login success.' + user_id, 'bot');
         console.log("success login")
     }else{
         console.log("fail login")
@@ -33,17 +34,16 @@ async function sendMessage() {
     const message = userInput.value;
     userInput.value = '';  // Clear input field
 
-    displayMessage(message, 'user');
-
-    const ask_url = server_url + '/api/ask';
+    const ask_url = '/api/ask?question=' + message;
     // Replace with your question API URL
     const response = await fetch(ask_url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${jwtToken}`,
+            // 'Authorization': `Bearer ${jwtToken}`,
         },
-        body: JSON.stringify({qs: message}),
+        body: JSON.stringify({question: message}),
+        credentials: 'include'
     });
 
     if (!response.ok) {
@@ -51,12 +51,16 @@ async function sendMessage() {
         return;
     }
 
+    // Simulate thinking animation
+    displayMessage('...', 'bot');
+
     // Extract question_id from the response
     const data = await questionResponse.json();
     const question_id = data.identifier
 
+    const debug = "id: " + question_id
     // Simulate thinking animation
-    displayMessage('...', 'bot');
+    displayMessage(debug, 'bot');
 
     const answer_url = server_url + '/api/response';
     // Function to poll for the answer

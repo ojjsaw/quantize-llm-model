@@ -63,7 +63,7 @@ while True:
             new_response_body['hw'] = cpu_name
             
             # simulate 30sec work
-            time.sleep(30)
+            time.sleep(10)
             
             message_group_id = 'messageGroup1'
             message_deduplication_id = 'uniqueMessageId123'
