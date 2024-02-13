@@ -14,6 +14,10 @@ pip install -r requirements.txt
 python convert.py --model_id Intel/neural-chat-7b-v3-3 --output_dir models/neural-chat-7b-v3-3-INT4_ASYM-0.8-128 --compress_weights INT4_ASYM --ratio 0.8 --group_size 128
 
 python convert.py --model_id Intel/neural-chat-7b-v3-3 --output_dir models/neural-chat-7b-v3-3-INT4_SYM --compress_weights INT4_SYM
+
+# not tried
+python convert.py --model_id Intel/neural-chat-7b-v3-3 --output_dir models/neural-chat-7b-v3-3-INT4_ASYM-0.6-64 --compress_weights INT4_ASYM --ratio 0.6 --group_size 64
+
 ```
 
 ```bash

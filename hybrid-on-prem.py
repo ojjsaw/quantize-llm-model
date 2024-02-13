@@ -54,7 +54,9 @@ def process_response(data, duration, user: str, question_id: str):
     for doc in data['context']:
         if hasattr(doc, 'metadata') and isinstance(doc.metadata, dict):
             metadata = doc.metadata
-            url_dict = {"txt": metadata['title'], "url": metadata['source']}
+            orig_title = metadata['title']
+            mod_title = orig_title.replace("— OpenVINO™  documentation","")
+            url_dict = {"txt": mod_title, "url": metadata['source']}
             if not any(source['url'] == url_dict['url'] for source in response_data['src']):
                 if 'Glossary' not in url_dict['txt']:
                     response_data['src'].append(url_dict)
@@ -111,7 +113,7 @@ while True:
     
     if not messages:
         print("No messages to process. Waiting for new messages...")
-        time.sleep(1)
+        #time.sleep(1)
         continue  # Skip to the next iteration of the loop
 
     for message in messages:
