@@ -27,7 +27,7 @@ os.environ['HF_TOKEN'] = "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"
 store_dir = 'data/VectorStores/20240130_213318'
 model_id = 'data/neural-chat-7b-v3-3-INT4_SYM/pytorch/dldt/compressed_weights/OV_FP32-INT4_SYM'
 embeddings_model = 'jinaai/jina-embeddings-v2-base-en'
-max_new_tokens = 300
+max_new_tokens = 140
 
 warnings.filterwarnings("ignore")
 
@@ -73,7 +73,7 @@ embeddings = HuggingFaceEmbeddings(
 ### prompt and vector store load
 vector_store = Chroma(persist_directory=store_dir, embedding_function=embeddings)
 retriever = vector_store.as_retriever()
-prompt = hub.pull("rlm/rag-prompt")
+prompt = hub.pull("rlm/rag-prompt-mistral")
 
 ### llm model
 tokenizer = AutoTokenizer.from_pretrained(model_id)
