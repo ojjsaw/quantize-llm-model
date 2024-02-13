@@ -34,19 +34,19 @@ async function sendMessage() {
     const message = userInput.value;
     userInput.value = '';  // Clear input field
 
-    const ask_url = '/api/ask?question=' + message;
-    // Replace with your question API URL
-    const response = await fetch(ask_url, {
+    const encodedQuestion = encodeURIComponent(message);
+    const ask_url = '/api/ask?question=' + encodedQuestion;
+    console.log(ask_url)
+    const questionResponse = await fetch(ask_url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            // 'Authorization': `Bearer ${jwtToken}`,
         },
         body: JSON.stringify({question: message}),
         credentials: 'include'
     });
 
-    if (!response.ok) {
+    if (!questionResponse.ok) {
         displayMessage('Error sending message.', 'bot');
         return;
     }
@@ -56,21 +56,21 @@ async function sendMessage() {
 
     // Extract question_id from the response
     const data = await questionResponse.json();
-    const question_id = data.identifier
+    console.log(data)
 
-    const debug = "id: " + question_id
-    // Simulate thinking animation
-    displayMessage(debug, 'bot');
-
-    const answer_url = server_url + '/api/response';
+    const question_id = encodeURIComponent(data.identifier);
+    
+    const answer_url = '/api/response?question_id=' + question_id;
+    console.log(answer_url)
     // Function to poll for the answer
     const getAnswer = async () => {
         const answerResponse = await fetch(answer_url, {
-            method: 'GET',
+            method: 'POST',
             headers: {
-                'Authorization': `Bearer ${jwtToken}`,
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify({question_id: question_id}),
+            credentials: 'include'
         });
 
         if (!answerResponse.ok) {
@@ -78,13 +78,14 @@ async function sendMessage() {
             return;
         }
 
-        const answerData = await answerResponse.json(); // Adjust based on your API's response structure
+        const answerData = await answerResponse.json();
+        console.log(answerData)
         // Check if answer is available, if not, keep polling
         if (answerData.answer_found) { // Adjust condition based on how your API indicates answer is ready
             displayMessage(answerData.answer, 'bot'); // Display the answer
         } else {
             // If answer not yet available, poll again after 30 seconds
-            setTimeout(getAnswer, 30000);
+            setTimeout(getAnswer, 20000);
         }
     };
 
