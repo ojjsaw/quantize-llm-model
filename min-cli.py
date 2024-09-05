@@ -12,7 +12,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 from langchain import hub
 
-os.environ['HF_TOKEN'] = "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"
+os.environ['HF_TOKEN'] = ""
 
 store_dir = 'data/VectorStores/20240130_213318'
 model_id = 'data/neural-chat-7b-v3-3-INT4_SYM/pytorch/dldt/compressed_weights/OV_FP32-INT4_SYM'
